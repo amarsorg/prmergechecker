@@ -1,21 +1,21 @@
-name: Validate code in the merge queue
+name: Feature flags workflow trigger
 
 on:
- pull_request:
-    branches: [ "main" ]
- merge_group:
-    types: [checks_requested]
+ 
+  pull_request:
+    branches: ["main"]
+    types: [opened, closed]
 
 jobs:
-  validate-pr-and-push-flags:
+  check-pr:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-    - name: Display info
-      run: | 
-        pwd
-        tree -a -I '.git'
-        git status
-    - name: Run slow CI (emulated by a long sleep)
-      run: exit 1
+      - name: Check PR event
+        run: |
+          if [ "${GITHUB_EVENT_NAME}" == "pull_request" ]; then
+            if [ "${GITHUB_EVENT_ACTION}" == "opened" ]; then
+              echo "PR opened"
+            elif [ "${GITHUB_EVENT_ACTION}" == "closed" ]; then
+              echo "PR closed"
+            fi
+          fi
